@@ -1,6 +1,7 @@
 import sys
 from tkinter import *
 import tkinter as tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 class ConsoleRedirector:
@@ -26,21 +27,27 @@ def get_inputs():
 root = tk.Tk()
 root.title("System wieloagentowy")
 
+# framy główne
+frame = tk.Frame(root, borderwidth=2, relief=tk.GROOVE)
+frame.pack(side=tk.LEFT, padx=10, pady=10)
+
+frame_right = tk.Frame(root, borderwidth=2, relief=tk.GROOVE)
+frame_right.pack(side=tk.RIGHT, padx=10, pady=10)
+
+# framy lewo
+frame_inputy = tk.LabelFrame(frame, text="Inputs")
+frame_inputy.pack(padx=5, pady=5)
+
+frame_good_will = tk.LabelFrame(frame, text="Good will")
+frame_good_will.pack(padx=5, pady=5)
+
+frame_starting_trust_measure = tk.LabelFrame(frame, text="Starting trust measure")
+frame_starting_trust_measure.pack(padx=5, pady=5)
+
 # grupy
-inputs_group = tk.LabelFrame(root, text="Input")
-inputs_group.pack()
-
-good_will_group = tk.LabelFrame(root, text="Good will")
-good_will_group.pack()
-
-starting_trust_measure_group = tk.LabelFrame(root, text="Starting trust measure")
-starting_trust_measure_group.pack()
-
 options_group = tk.LabelFrame(root, text="Options")
-options_group.pack()
+options_group.pack(side=tk.LEFT, padx=10, pady=10)
 
-actions_group = tk.LabelFrame(root, text="Actions")
-actions_group.pack()
 
 # tablice ze zczytanymi wartościami
 input_entries = []
@@ -64,20 +71,24 @@ def add_labels(group, labels_list, input_arr):
         input_arr.append(entry)
 
 
-add_labels(inputs_group, inputs_labels, input_entries)
-add_labels(good_will_group, good_will_labels, good_will)
-add_labels(starting_trust_measure_group, starting_trust_measure_labels, starting_trust_measure)
+add_labels(frame_inputy, inputs_labels, input_entries)
+add_labels(frame_good_will, good_will_labels, good_will)
+add_labels(frame_starting_trust_measure, starting_trust_measure_labels, starting_trust_measure)
 # add_radiobuttons()
-# add_button()
 
 # start programu
-button = tk.Button(actions_group, text="Pobierz dane", command=get_inputs)
-button.pack()
+button = tk.Button(frame, text="Start", command=get_inputs)
+button.pack(side=tk.BOTTOM, padx=10, pady=10)
 
 # przekierowanie konsoli na aplikację
-text_widget = tk.Text(root)
-text_widget.pack()
+text_widget = tk.Text(frame_right)
+text_widget.pack(side=tk.BOTTOM, padx=10, pady=10)
 console_redirector = ConsoleRedirector(text_widget)
 sys.stdout = console_redirector
+
+# wykres
+canvas = FigureCanvasTkAgg(None, master=frame_right)
+canvas.draw()
+canvas.get_tk_widget().pack()
 
 root.mainloop()
