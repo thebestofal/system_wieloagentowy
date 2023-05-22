@@ -57,7 +57,7 @@ options = []
 actions = []
 
 # nazwy pól
-inputs_labels = ["Cykle", "Agenci", "s-Agents", "kmin", "kmax", "dystrybuantaA", "dystrybuantaG"]
+inputs_labels = ["Cykle", "Agenci", "s-Agents", "kmin", "kmax", "expoA", "expoG"]
 good_will_labels = ["x", "y", "z"]
 starting_trust_measure_labels = ["V_0 trust"]
 
