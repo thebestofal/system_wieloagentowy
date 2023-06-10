@@ -18,11 +18,10 @@ class ConsoleRedirector:
 
 # start programu TODO dodać reszte inputów
 def get_inputs():
-    inputs = []
-    for entry in input_entries:
-        inputs.append(entry.get())
-    print(inputs)  # Możesz dostosować tę część kodu, aby wykorzystać wartości wprowadzone przez użytkownika
-
+    inputs = {}
+    for key, value in input_entries.items():
+        inputs[key] = value.get()
+    print(inputs)
 
 root = tk.Tk()
 root.title("System wieloagentowy")
@@ -50,30 +49,35 @@ options_group.pack(side=tk.LEFT, padx=10, pady=10)
 
 
 # tablice ze zczytanymi wartościami
-input_entries = []
-good_will = []
-starting_trust_measure = []
-options = []
-actions = []
+input_entries = {}
 
 # nazwy pól
-inputs_labels = ["Cykle", "Agenci", "s-Agents", "kmin", "kmax", "expoA", "expoG"]
-good_will_labels = ["x", "y", "z"]
-starting_trust_measure_labels = ["V_0 trust"]
+inputs_labels = {"Cykle": 30, "Agenci": 500, "s-Agents": 50, "kmin": 50, "kmax": 100, "expoA": 10, "expoG": 10}
+good_will_labels = {"x": 0.8, "y": 0.8, "z": 0.8}
+starting_trust_measure_labels = {"V_0 trust": 1.0}
 
 
-def add_labels(group, labels_list, input_arr):
-    for l in labels_list:
-        label = tk.Label(group, text=l)
+# def add_labels2(group, labels_list):
+#     for l in labels_list:
+#         label = tk.Label(group, text=l)
+#         label.pack()
+#         entry = tk.Entry(group)
+#         entry.pack()
+
+
+def add_labels(group, param_list, entries):
+    for key, value in param_list.items():
+        label = tk.Label(group, text=key)
         label.pack()
-        entry = tk.Entry(group)
+        entry = Entry(group)
+        entry.insert(0, value)
         entry.pack()
-        input_arr.append(entry)
+        entries[key] = entry
 
 
 add_labels(frame_inputy, inputs_labels, input_entries)
-add_labels(frame_good_will, good_will_labels, good_will)
-add_labels(frame_starting_trust_measure, starting_trust_measure_labels, starting_trust_measure)
+add_labels(frame_good_will, good_will_labels, input_entries)
+add_labels(frame_starting_trust_measure, starting_trust_measure_labels, input_entries)
 # add_radiobuttons()
 
 # start programu
