@@ -2,6 +2,7 @@ import sys
 from tkinter import *
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import system
 
 
 class ConsoleRedirector:
@@ -52,17 +53,9 @@ options_group.pack(side=tk.LEFT, padx=10, pady=10)
 input_entries = {}
 
 # nazwy pól
-inputs_labels = {"Cykle": 30, "Agenci": 500, "s-Agents": 50, "kmin": 50, "kmax": 100, "expoA": 10, "expoG": 10}
+inputs_labels = {"Cykle": 30, "Agenci": 500, "sAgenci": 50, "kmin": 50, "kmax": 100, "expoA": 10, "expoG": 10}
 good_will_labels = {"x": 0.8, "y": 0.8, "z": 0.8}
-starting_trust_measure_labels = {"V_0 trust": 1.0}
-
-
-# def add_labels2(group, labels_list):
-#     for l in labels_list:
-#         label = tk.Label(group, text=l)
-#         label.pack()
-#         entry = tk.Entry(group)
-#         entry.pack()
+starting_trust_measure_labels = {"V_0": 1.0}
 
 
 def add_labels(group, param_list, entries):
@@ -78,7 +71,6 @@ def add_labels(group, param_list, entries):
 add_labels(frame_inputy, inputs_labels, input_entries)
 add_labels(frame_good_will, good_will_labels, input_entries)
 add_labels(frame_starting_trust_measure, starting_trust_measure_labels, input_entries)
-# add_radiobuttons()
 
 # start programu
 button = tk.Button(frame, text="Start", command=get_inputs)
@@ -94,5 +86,10 @@ sys.stdout = console_redirector
 canvas = FigureCanvasTkAgg(None, master=frame_right)
 canvas.draw()
 canvas.get_tk_widget().pack()
+
+# p = system.Params(input_entries)
+# print(p.sAgentList)
+
+system.start_simulation(input_entries)
 
 root.mainloop()
