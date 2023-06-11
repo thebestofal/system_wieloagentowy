@@ -2,6 +2,8 @@ import collections
 import random
 import time
 from itertools import count
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 DATA = collections.deque([])
 RANDOM = random.randint(1, 100)
@@ -10,9 +12,13 @@ RANDOM = random.randint(1, 100)
 class Params:
     def __init__(self, parameters):
         for key, value in parameters.items():
-            setattr(self, key, value.get())
-        #self.A = int(parameters['sAgents'].get())
-        s = int(self.sAgenci)
+            if key in ['x', 'y', 'z', 'V_0']:
+                setattr(self, key, float(value.get()))
+            else:
+                setattr(self, key, int(value.get()))
+
+        # self.A = int(parameters['sAgenci'].get())
+        s = int(self.Agenci)
         self.sAgentList = [0] * s
         num_ones = random.randint(1, s)  # Generate a random number of ones between 1 and size
 
@@ -28,6 +34,12 @@ class Cycle:
         self.meanVs = 0.0
         self.meanVh = 0.0
         self.netOutflow = 0.0
+
+    def __init__(self, V, meanVs, meanVh, netOutflow):
+        self.V = V
+        self.meanVs = meanVs
+        self.meanVh = meanVh
+        self.netOutflow = netOutflow
 
 
 # policy
@@ -56,14 +68,27 @@ def rand_expo_d(expo):
 
 
 # --------------------
-def plot(series):
-    pass
+def plot_on_frame(series, frame, canvas):
+    n = len(series[0][1])
+    x_values = list(range(1, n + 1))
+
+    fig, ax = plt.subplots()
+    for name, values in series:
+        ax.plot(x_values, values, label=name)
+
+    ax.set_xlabel("Cycle")
+    ax.set_ylabel("Value")
+    ax.legend()
+
+    canvas = FigureCanvasTkAgg(fig, master=frame)
+    canvas.draw()
+    canvas.get_tk_widget().pack()
 
 
-def start_simulation(p, progress_fun, return_fun):
+def start_simulation(p, frame, canvas):
     DATA.clear()
     parameters = Params(p)
-    for cycle in parameters.Cykle:
+    for cycle in range(parameters.Cykle):
         sum_ph_to_s = 0.0
         number_hjs = 0
         sum_ps_to_h = 0.0
@@ -71,61 +96,60 @@ def start_simulation(p, progress_fun, return_fun):
         counter_ss_coop = 0
         counter_all_coop = 0
 
-        adj = [[0] * parameters.Agents for _ in range(parameters.Agents)]
+        adj = [[0] * parameters.Agenci for _ in range(parameters.Agenci)]
 
-        for i in range(parameters.Agents):
-            count_c = 0
+        for i in range(parameters.Agenci):
             clients = random.randint(parameters.kmin, parameters.kmax + 1)
             in_j = 0
-            rn = 0
             while in_j < clients:
-                rn = random.randint(0, parameters.Agents - 1)
+                rn = random.randint(0, parameters.Agenci - 1)
                 if rn != i and adj[i][rn] != 1:
                     adj[i][rn] = 1
-                    if parameters.sAgenci[i] == 1:
-                        if parameters.sAgenci[rn] != 1:
+                    if parameters.sAgentList[i] == 1:
+                        if parameters.sAgentList[rn] != 1:
                             number_sjh += 1
                     else:
-                        if parameters.sAgenci[rn] == 1:
+                        if parameters.sAgentList[rn] == 1:
                             number_hjs += 1
                     in_j += 1
 
-        agents_r = {}
+        Agenci_r = {}
 
         for it in range(parameters.Agenci):
             clients = adj[it]
-            v_prov = parameters['V0'] if cycle == 0 else DATA[cycle - 1]['V'][it]
+            v_prov = parameters.V_0 if cycle == 0 else DATA[cycle - 1].V[it]
             num_clients = clients.count(1)
             mean_policy_r = 0.0
 
             for j in range(parameters.Agenci):
                 if adj[it][j] == 1:
-                    v_repo = parameters['V0'] if cycle == 0 else DATA[cycle - 1]['V'][j]
-                    l = h_step(v_repo, parameters['X'])
-                    p = s_bias_p(parameters['Y'], l) if parameters.sAgenci[it] == 1 else l
-                    if parameters.sAgenci[it] == 1 and parameters.sAgenci[j] == 1:
+                    v_repo = parameters.V_0 if cycle == 0 else DATA[cycle - 1].V[j]
+                    l = h_step(v_repo, parameters.x)
+                    p = s_bias_p(parameters.y, l) if parameters.sAgentList[it] == 1 else l
+                    if parameters.sAgentList[it] == 1 and parameters.sAgentList[j] == 1:
                         p = 1.0
-                    policy_p = provider_policy(rand_expo_d(parameters['ExpoA']), p)
-                    l = h_step(v_prov, parameters['X'])
-                    r = s_bias_r(parameters['Z'], l) if parameters.sAgenci[j] == 1 else l
-                    if parameters.sAgenci[it] == 1 and parameters.sAgenci[j] == 1:
+                    policy_p = provider_policy(rand_expo_d(parameters.expoA), p)
+                    l = h_step(v_prov, parameters.x)
+                    r = s_bias_r(parameters.z, l) if parameters.sAgentList[j] == 1 else l
+                    if parameters.sAgentList[it] == 1 and parameters.sAgentList[j] == 1:
                         r = 1.0
-                    policy_r = reporter_policy(rand_expo_d(parameters['ExpoG']), policy_p, r)
+                    policy_r = reporter_policy(rand_expo_d(parameters.expoG), policy_p, r)
                     mean_policy_r += policy_r * v_prov
-                    if parameters.sAgenci[it] == 1 and parameters.sAgenci[j] == 1:
+                    if parameters.sAgentList[it] == 1 and parameters.sAgentList[j] == 1:
                         counter_ss_coop += 1
                     counter_all_coop += 1
-                    if parameters.sAgenci[it] == 1:
-                        if parameters.sAgenci[j] != 1:
+                    if parameters.sAgentList[it] == 1:
+                        if parameters.sAgentList[j] != 1:
                             sum_ps_to_h += policy_p
                     else:
-                        if parameters.sAgenci[j] == 1:
+                        if parameters.sAgentList[j] == 1:
                             sum_ph_to_s += policy_p
 
             mean_policy_r /= num_clients
-            agents_r[it] = mean_policy_r
+            Agenci_r[it] = mean_policy_r
 
-        sorted_by_r = dict(sorted(agents_r.items(), key=lambda x: x[1]))
+        sorted_by_r = {k: v for k, v in sorted(Agenci_r.items(), key=lambda x: x[1])}
+        # sorted_by_r = dict(sorted(Agenci_r.items(), key=lambda x: x[1]))
 
         mean_r_higher_set = 0.0
         mean_r_lower_set = 0.0
@@ -158,28 +182,27 @@ def start_simulation(p, progress_fun, return_fun):
         mean_vh = 0.0
 
         for it in range(parameters.Agenci):
-            if parameters.sAgenci[it] == 1:
+            if parameters.sAgentList[it] == 1:
                 mean_vs += V[it]
             else:
                 mean_vh += V[it]
 
-        mean_vh /= parameters.Agenci - parameters['S']
-        mean_vs /= parameters['S']
+        mean_vh /= parameters.Agenci - parameters.sAgenci
+        mean_vs /= parameters.sAgenci
 
         net_outflow = (sum_ph_to_s / number_hjs) - (sum_ps_to_h / number_sjh)
 
         DATA.append(Cycle(V, mean_vs, mean_vh, net_outflow))
 
         time.sleep(0.01)
-        progress_fun((cycle + 1) / parameters['NC'] * 100)
+        print('Progres: ', (cycle + 1) / parameters.Cykle * 100)
 
     series = [
-        ("meanVh", [cycle['meanVh'] for cycle in DATA]),
-        ("meanVs", [cycle['meanVs'] for cycle in DATA]),
-        ("netOutflow", [cycle['netOutflow'] for cycle in DATA])
+        ("meanVh", [cycle.meanVh for cycle in DATA]),
+        ("meanVs", [cycle.meanVs for cycle in DATA]),
+        ("netOutflow", [cycle.netOutflow for cycle in DATA])
     ]
-    plot(series)
-    return_fun()
+    plot_on_frame(series, frame, canvas)
 
 
 # cycle_thread = threading.Thread(target=cycle)

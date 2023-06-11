@@ -1,6 +1,8 @@
 import sys
 from tkinter import *
 import tkinter as tk
+
+from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import system
 
@@ -72,8 +74,17 @@ add_labels(frame_inputy, inputs_labels, input_entries)
 add_labels(frame_good_will, good_will_labels, input_entries)
 add_labels(frame_starting_trust_measure, starting_trust_measure_labels, input_entries)
 
+
+def clear_canvas(canvas):
+    canvas.get_tk_widget().destroy()
+
+# wykres
+canvas = FigureCanvasTkAgg(None, master=frame_right)
+canvas.draw()
+canvas.get_tk_widget().pack()
+
 # start programu
-button = tk.Button(frame, text="Start", command=get_inputs)
+button = tk.Button(frame, text="Start", command= lambda: [get_inputs, system.start_simulation(input_entries, frame_right, canvas)])
 button.pack(side=tk.BOTTOM, padx=10, pady=10)
 
 # przekierowanie konsoli na aplikację
@@ -82,14 +93,11 @@ text_widget.pack(side=tk.BOTTOM, padx=10, pady=10)
 console_redirector = ConsoleRedirector(text_widget)
 sys.stdout = console_redirector
 
-# wykres
-canvas = FigureCanvasTkAgg(None, master=frame_right)
-canvas.draw()
-canvas.get_tk_widget().pack()
+
 
 # p = system.Params(input_entries)
 # print(p.sAgentList)
 
-system.start_simulation(input_entries)
+# system.start_simulation(input_entries)
 
 root.mainloop()
