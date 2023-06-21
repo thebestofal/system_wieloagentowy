@@ -22,9 +22,8 @@ class Params:
         # self.A = int(parameters['sAgenci'].get())
         s = int(self.Agenci)
         self.sAgentList = [0] * s
-        num_ones = random.randint(1, s)  # Generate a random number of ones between 1 and size
 
-        indexes = random.sample(range(s), num_ones)  # Randomly select indexes to fill with ones
+        indexes = random.sample(range(s), int(self.sAgenci))  # Randomly select indexes to fill with ones
 
         for idx in indexes:
             self.sAgentList[idx] = 1
