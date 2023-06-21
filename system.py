@@ -1,12 +1,14 @@
 import collections
 import random
 import time
+import tkinter
 from itertools import count
 import matplotlib.pyplot as plt
+from matplotlib.backends._backend_tk import NavigationToolbar2Tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 DATA = collections.deque([])
-RANDOM = random.randint(1, 100)
+random.seed(100)
 
 
 class Params:
@@ -68,7 +70,7 @@ def rand_expo_d(expo):
 
 
 # --------------------
-def plot_on_frame(series, frame, canvas):
+def plot_on_frame(series):
     n = len(series[0][1])
     x_values = list(range(1, n + 1))
 
@@ -80,12 +82,10 @@ def plot_on_frame(series, frame, canvas):
     ax.set_ylabel("Value")
     ax.legend()
 
-    canvas = FigureCanvasTkAgg(fig, master=frame)
-    canvas.draw()
-    canvas.get_tk_widget().pack()
+    plt.show()
 
 
-def start_simulation(p, frame, canvas):
+def start_simulation(p):
     DATA.clear()
     parameters = Params(p)
     for cycle in range(parameters.Cykle):
@@ -165,6 +165,8 @@ def start_simulation(p, frame, canvas):
         mean_r_higher_set /= len(sorted_by_r) // 2
         mean_r_lower_set /= len(sorted_by_r) // 2
 
+        print(f'meanRHigherSet: {mean_r_higher_set}, meanRLowerSet: {mean_r_lower_set}')
+
         mean_r_lower_set /= mean_r_higher_set
         mean_r_higher_set /= mean_r_higher_set
 
@@ -195,14 +197,19 @@ def start_simulation(p, frame, canvas):
         DATA.append(Cycle(V, mean_vs, mean_vh, net_outflow))
 
         time.sleep(0.01)
-        print('Progres: ', (cycle + 1) / parameters.Cykle * 100)
+        print(f'netOutflow: {net_outflow}, sumPHToS: {sum_ph_to_s}', end=' ')
+        print(f'numberHJS: {number_hjs}, sumPSToH: {sum_ps_to_h}, numberSJH: {number_sjh}')
+        print(f'meanRHigherSet: {mean_r_higher_set}, meanRLowerSet: {mean_r_lower_set}')
+        print(f'meanVs: {mean_vs}, meanVh: {mean_vh}')
+
+        print('Progres: ', (cycle + 1) / parameters.Cykle * 100, end='\n\n')
 
     series = [
         ("meanVh", [cycle.meanVh for cycle in DATA]),
         ("meanVs", [cycle.meanVs for cycle in DATA]),
         ("netOutflow", [cycle.netOutflow for cycle in DATA])
     ]
-    plot_on_frame(series, frame, canvas)
+    plot_on_frame(series)
 
 
 # cycle_thread = threading.Thread(target=cycle)

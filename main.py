@@ -26,6 +26,8 @@ def get_inputs():
         inputs[key] = value.get()
     print(inputs)
 
+
+
 root = tk.Tk()
 root.title("System wieloagentowy")
 
@@ -33,8 +35,8 @@ root.title("System wieloagentowy")
 frame = tk.Frame(root, borderwidth=2, relief=tk.GROOVE)
 frame.pack(side=tk.LEFT, padx=10, pady=10)
 
-frame_right = tk.Frame(root, borderwidth=2, relief=tk.GROOVE)
-frame_right.pack(side=tk.RIGHT, padx=10, pady=10)
+# frame_right = tk.Frame(root, borderwidth=2, relief=tk.GROOVE)
+# frame_right.pack(side=tk.RIGHT, padx=10, pady=10)
 
 # framy lewo
 frame_inputy = tk.LabelFrame(frame, text="Inputs")
@@ -79,19 +81,19 @@ def clear_canvas(canvas):
     canvas.get_tk_widget().destroy()
 
 # wykres
-canvas = FigureCanvasTkAgg(None, master=frame_right)
-canvas.draw()
-canvas.get_tk_widget().pack()
+# canvas = FigureCanvasTkAgg(None, master=frame_right)
+# canvas.draw()
+# canvas.get_tk_widget().pack()
 
 # start programu
-button = tk.Button(frame, text="Start", command= lambda: [get_inputs, system.start_simulation(input_entries, frame_right, canvas)])
+button = tk.Button(frame, text="Start", command= lambda: [get_inputs, system.start_simulation(input_entries)])
 button.pack(side=tk.BOTTOM, padx=10, pady=10)
 
 # przekierowanie konsoli na aplikację
-text_widget = tk.Text(frame_right)
-text_widget.pack(side=tk.BOTTOM, padx=10, pady=10)
-console_redirector = ConsoleRedirector(text_widget)
-sys.stdout = console_redirector
+# text_widget = tk.Text(frame_right)
+# text_widget.pack(side=tk.BOTTOM, padx=10, pady=10)
+# console_redirector = ConsoleRedirector(text_widget)
+# sys.stdout = console_redirector
 
 
 
