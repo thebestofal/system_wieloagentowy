@@ -6,6 +6,11 @@ from itertools import count
 import matplotlib.pyplot as plt
 from matplotlib.backends._backend_tk import NavigationToolbar2Tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+# from sklearn.cluster import KMeans
+from kmeans import *
+import numpy as np
+import csv
+from datetime import datetime
 
 DATA = collections.deque([])
 random.seed(100)
@@ -14,7 +19,7 @@ random.seed(100)
 class Params:
     def __init__(self, parameters):
         for key, value in parameters.items():
-            if key in ['x', 'y', 'z', 'V_0']:
+            if key in ['x', 'y', 'z', 'V_0', 'expoA', 'expoG']:
                 setattr(self, key, float(value.get()))
             else:
                 setattr(self, key, int(value.get()))
@@ -69,6 +74,19 @@ def rand_expo_d(expo):
 
 
 # --------------------
+def save_to_csv(series, filename):
+    with open(filename, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Cycle'] + [name for name, _ in series])  # Nagłówki kolumn
+
+        n = len(series[0][1])
+        x_values = list(range(1, n + 1))
+
+        for i in range(n):
+            row = [x_values[i]] + [values[i] for _, values in series]
+            writer.writerow(row)
+
+
 def plot_on_frame(series):
     n = len(series[0][1])
     x_values = list(range(1, n + 1))
@@ -147,6 +165,17 @@ def start_simulation(p):
             mean_policy_r /= num_clients
             Agenci_r[it] = mean_policy_r
 
+        formatDataKMeans = []
+
+        # for iR in range(len(Agenci_r)):
+        #     formatDataKMeans.append([Agenci_r[iR], 1, iR])
+        #
+        # kMeans = KMeans(100, formatDataKMeans, 2)
+        # group = kMeans.group()
+        # print(group)
+
+
+
         sorted_by_r = {k: v for k, v in sorted(Agenci_r.items(), key=lambda x: x[1])}
         # sorted_by_r = dict(sorted(Agenci_r.items(), key=lambda x: x[1]))
 
@@ -208,6 +237,8 @@ def start_simulation(p):
         ("meanVs", [cycle.meanVs for cycle in DATA]),
         ("netOutflow", [cycle.netOutflow for cycle in DATA])
     ]
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    save_to_csv(series, f'csv_data\\{timestamp}-data.csv')
     plot_on_frame(series)
 
 
