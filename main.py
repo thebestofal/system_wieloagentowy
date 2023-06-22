@@ -1,9 +1,5 @@
-import sys
 from tkinter import *
 import tkinter as tk
-
-from matplotlib import pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import system
 
 
@@ -19,13 +15,11 @@ class ConsoleRedirector:
         pass
 
 
-# start programu TODO dodać reszte inputów
 def get_inputs():
     inputs = {}
     for key, value in input_entries.items():
         inputs[key] = value.get()
     print(inputs)
-
 
 
 root = tk.Tk()
@@ -35,8 +29,6 @@ root.title("System wieloagentowy")
 frame = tk.Frame(root, borderwidth=2, relief=tk.GROOVE)
 frame.pack(side=tk.LEFT, padx=10, pady=10)
 
-# frame_right = tk.Frame(root, borderwidth=2, relief=tk.GROOVE)
-# frame_right.pack(side=tk.RIGHT, padx=10, pady=10)
 
 # framy lewo
 frame_inputy = tk.LabelFrame(frame, text="Inputs")
@@ -80,26 +72,9 @@ add_labels(frame_starting_trust_measure, starting_trust_measure_labels, input_en
 def clear_canvas(canvas):
     canvas.get_tk_widget().destroy()
 
-# wykres
-# canvas = FigureCanvasTkAgg(None, master=frame_right)
-# canvas.draw()
-# canvas.get_tk_widget().pack()
 
 # start programu
 button = tk.Button(frame, text="Start", command= lambda: [get_inputs, system.start_simulation(input_entries)])
 button.pack(side=tk.BOTTOM, padx=10, pady=10)
-
-# przekierowanie konsoli na aplikację
-# text_widget = tk.Text(frame_right)
-# text_widget.pack(side=tk.BOTTOM, padx=10, pady=10)
-# console_redirector = ConsoleRedirector(text_widget)
-# sys.stdout = console_redirector
-
-
-
-# p = system.Params(input_entries)
-# print(p.sAgentList)
-
-# system.start_simulation(input_entries)
 
 root.mainloop()

@@ -1,14 +1,8 @@
 import collections
 import random
 import time
-import tkinter
-from itertools import count
 import matplotlib.pyplot as plt
-from matplotlib.backends._backend_tk import NavigationToolbar2Tk
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-# from sklearn.cluster import KMeans
-from kmeans import *
-import numpy as np
+from sklearn.cluster import KMeans
 import csv
 from datetime import datetime
 
@@ -24,7 +18,6 @@ class Params:
             else:
                 setattr(self, key, int(value.get()))
 
-        # self.A = int(parameters['sAgenci'].get())
         s = int(self.Agenci)
         self.sAgentList = [0] * s
 
@@ -167,31 +160,35 @@ def start_simulation(p):
 
         formatDataKMeans = []
 
-        # for iR in range(len(Agenci_r)):
-        #     formatDataKMeans.append([Agenci_r[iR], 1, iR])
-        #
-        # kMeans = KMeans(100, formatDataKMeans, 2)
-        # group = kMeans.group()
-        # print(group)
+        for iR in range(len(Agenci_r)):
+            formatDataKMeans.append([Agenci_r[iR], 1])
 
+        kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
+        kmeans.fit(formatDataKMeans)
+        labels = kmeans.predict(formatDataKMeans)
 
-
-        sorted_by_r = {k: v for k, v in sorted(Agenci_r.items(), key=lambda x: x[1])}
-        # sorted_by_r = dict(sorted(Agenci_r.items(), key=lambda x: x[1]))
 
         mean_r_higher_set = 0.0
         mean_r_lower_set = 0.0
-        iter = 0
-
-        for value in sorted_by_r.values():
-            if iter < len(sorted_by_r) // 2:
-                mean_r_lower_set += value
+        c1 = 0
+        c0 = 0
+        for x in range(len(labels)):
+            if labels[x] == 1:
+                mean_r_higher_set += Agenci_r[x]
+                c1 += 1
             else:
-                mean_r_higher_set += value
-            iter += 1
+                mean_r_lower_set += Agenci_r[x]
+                c0 += 1
 
-        mean_r_higher_set /= len(sorted_by_r) // 2
-        mean_r_lower_set /= len(sorted_by_r) // 2
+        mean_r_higher_set /= c1
+        mean_r_lower_set /= c0
+
+        swap = False
+        if mean_r_higher_set < mean_r_lower_set:
+            tmp = mean_r_lower_set
+            mean_r_lower_set = mean_r_higher_set
+            mean_r_higher_set = tmp
+            swap = True
 
         print(f'meanRHigherSet: {mean_r_higher_set}, meanRLowerSet: {mean_r_lower_set}')
 
@@ -201,11 +198,17 @@ def start_simulation(p):
         V = [0.0] * parameters.Agenci
         iter = 0
 
-        for key in sorted_by_r.keys():
-            if iter < len(sorted_by_r) // 2:
-                V[key] = mean_r_lower_set
+        for label in labels:
+            if label == 1:
+                if swap:
+                    V[iter] = mean_r_lower_set
+                else:
+                    V[iter] = mean_r_higher_set
             else:
-                V[key] = mean_r_higher_set
+                if swap:
+                    V[iter] = mean_r_higher_set
+                else:
+                    V[iter] = mean_r_lower_set
             iter += 1
 
         mean_vs = 0.0
@@ -230,7 +233,7 @@ def start_simulation(p):
         print(f'meanRHigherSet: {mean_r_higher_set}, meanRLowerSet: {mean_r_lower_set}')
         print(f'meanVs: {mean_vs}, meanVh: {mean_vh}')
 
-        print('Progres: ', (cycle + 1) / parameters.Cykle * 100, end='\n\n')
+        print('Progres: ', round((cycle + 1) / parameters.Cykle * 100), '%',  end='\n\n')
 
     series = [
         ("meanVh", [cycle.meanVh for cycle in DATA]),
@@ -240,7 +243,3 @@ def start_simulation(p):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     save_to_csv(series, f'csv_data\\{timestamp}-data.csv')
     plot_on_frame(series)
-
-
-# cycle_thread = threading.Thread(target=cycle)
-# cycle_thread.start()
