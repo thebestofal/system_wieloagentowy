@@ -163,7 +163,7 @@ def start_simulation(p):
         for iR in range(len(Agenci_r)):
             formatDataKMeans.append([Agenci_r[iR], 1])
 
-        kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
+        kmeans = KMeans(n_clusters=2, random_state=42, n_init=50)
         kmeans.fit(formatDataKMeans)
         labels = kmeans.predict(formatDataKMeans)
 

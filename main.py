@@ -32,7 +32,7 @@ frame.pack(side=tk.LEFT, padx=10, pady=10)
 
 # framy lewo
 frame_inputy = tk.LabelFrame(frame, text="Inputs")
-frame_inputy.pack(padx=5, pady=5)
+frame_inputy.pack(side=tk.LEFT, padx=5, pady=5)
 
 frame_good_will = tk.LabelFrame(frame, text="Good will")
 frame_good_will.pack(padx=5, pady=5)
